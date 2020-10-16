@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "admin-lte@2.4.18",
+      "destination": "wwwroot/admin-lte/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "bootstrap@3.4.1",
+      "destination": "wwwroot/lib/bootstrap/"
+    },
+    {
+      "library": "font-awesome@4.7.0",
+      "destination": "wwwroot/font-awesome/"
+    },
+    {
+      "library": "jquery@3.4.1",
+      "destination": "wwwroot/lib/jquery/"
+    }
+  ]
+}
