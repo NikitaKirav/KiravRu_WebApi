@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 namespace KiravRu
 {
@@ -100,6 +103,12 @@ namespace KiravRu
             services.AddTransient<IArticlesAccess, ArticlesAccessRepository>();
             services.AddTransient<IHistoryChange, HistoryChangeRepository>();
             services.AddTransient<IConstant, ConstantRepository>();
+
+            services.AddDataProtection();
+                //.PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
+                //.SetApplicationName("KiravRu")
+                //.SetDefaultKeyLifetime(TimeSpan.FromDays(90))
+                //.ProtectKeysWithCertificate(new X509Certificate2("certificate.pfx", "password"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
