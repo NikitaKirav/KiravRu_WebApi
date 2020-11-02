@@ -9,8 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace KiravRu.Controllers
 {
     [Route("api/projects/artcanvas")]
@@ -34,14 +32,21 @@ namespace KiravRu.Controllers
         [Route("uploadImage")]
         public ActionResult UploadImage([FromBody] object imageData)
         {
-            //var result = CheckRemoteIpAddressOfUser();
-            //if (result != "Ok") { return Ok(new { result = result }); }
-            var image = JsonConvert.DeserializeObject<Image>(imageData.ToString());
-            string pathFileImage = ImageDrawing.SaveImage(image.ImageData);
-            AddNewHistoryNote(pathFileImage);
+            try
+            {            
+                var result = CheckRemoteIpAddressOfUser();
+                if (result != "Ok") { return Ok(new { result = result }); }
+                var image = JsonConvert.DeserializeObject<Image>(imageData.ToString());
+                string pathFileImage = ImageDrawing.SaveImage(image.ImageData);
+                AddNewHistoryNote(pathFileImage);
 
-            var files = ImageDrawing.GetFilesList();
-            return Ok(ImageDrawing.BubbleSort(files));
+                var files = ImageDrawing.GetFilesList();
+                return Ok(ImageDrawing.BubbleSort(files));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         [HttpGet]
