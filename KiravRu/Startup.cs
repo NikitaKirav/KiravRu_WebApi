@@ -104,10 +104,10 @@ namespace KiravRu
             services.AddTransient<IHistoryChange, HistoryChangeRepository>();
             services.AddTransient<IConstant, ConstantRepository>();
 
-            services.AddDataProtection();
-                //.PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
-                //.SetApplicationName("KiravRu")
-                //.SetDefaultKeyLifetime(TimeSpan.FromDays(90))
+            services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
+                .SetApplicationName("KiravRu")
+                .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
                 //.ProtectKeysWithCertificate(new X509Certificate2("certificate.pfx", "password"));
         }
 
