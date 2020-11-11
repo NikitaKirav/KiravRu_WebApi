@@ -22,61 +22,82 @@ namespace KiravRu.Infrastructure
             //using (var image = new Bitmap(System.Drawing.Image.FromFile(inputPath)))
             using (FileStream fileStream = new FileStream(inputPath, FileMode.Open))
             {
-                var image = new Bitmap(System.Drawing.Image.FromStream(fileStream));
-                int width, height;
-                if (image.Width > image.Height)
+                try
                 {
-                    width = size;
-                    height = Convert.ToInt32(image.Height * size / (double)image.Width);
-                }
-                else
-                {
-                    width = Convert.ToInt32(image.Width * size / (double)image.Height);
-                    height = size;
-                }
-                var resized = new Bitmap(width, height);
-                using (var graphics = Graphics.FromImage(resized))
-                {
-                    graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                    graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                    graphics.CompositingMode = CompositingMode.SourceCopy;
-                    graphics.DrawImage(image, 0, 0, width, height);
-                    using (var output = File.Open(outputPath, FileMode.Create))
+                    var image = new Bitmap(System.Drawing.Image.FromStream(fileStream));
+                    int width, height;
+                    if (image.Width > image.Height)
                     {
-                        var qualityParamId = Encoder.Quality;
-                        var encoderParameters = new EncoderParameters(1);
-                        encoderParameters.Param[0] = new EncoderParameter(qualityParamId, quality);
-                        var codec = ImageCodecInfo.GetImageDecoders()
-                            .FirstOrDefault(codec => codec.FormatID == ImageFormat.Png.Guid);
-                        resized.Save(output, codec, encoderParameters);
-                        output.Dispose();
-                        output.Close();
+                        width = size;
+                        height = Convert.ToInt32(image.Height * size / (double)image.Width);
+                    }
+                    else
+                    {
+                        width = Convert.ToInt32(image.Width * size / (double)image.Height);
+                        height = size;
+                    }
+                    var resized = new Bitmap(width, height);
+                    using (var graphics = Graphics.FromImage(resized))
+                    {
+                        try
+                        {
+                            graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                            graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                            graphics.CompositingMode = CompositingMode.SourceCopy;
+                            graphics.DrawImage(image, 0, 0, width, height);
+                            using (var output = File.Open(outputPath, FileMode.Create))
+                            {
+                                try
+                                {
+                                    var qualityParamId = Encoder.Quality;
+                                    var encoderParameters = new EncoderParameters(1);
+                                    encoderParameters.Param[0] = new EncoderParameter(qualityParamId, quality);
+                                    var codec = ImageCodecInfo.GetImageDecoders()
+                                        .FirstOrDefault(codec => codec.FormatID == ImageFormat.Png.Guid);
+                                    resized.Save(output, codec, encoderParameters);
+                                }
+                                catch (Exception ex)
+                                {
+                                    throw new Exception("KiravRu.Infrastructure.ImageDrawing Exception: " + ex.Message);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("KiravRu.Infrastructure.ImageDrawing Exception2: " + ex.Message);
+                        }
                     }
                 }
-                fileStream.Dispose();
-                fileStream.Close();
-            }            
+                catch (Exception ex)
+                {
+                    throw new Exception("KiravRu.Infrastructure.ImageDrawing Exception3: " + ex.Message);
+                }
+            }
         }
 
         public static string SaveImage(string image)
         {
-            string fileNameWitPath = path + (GetLastNumberOfFile() + 1).ToString() + ".png";
-            string fileNameWitPathNew = path + (GetLastNumberOfFile() + 1).ToString() + "_new.png";
-            using (FileStream fs = new FileStream(fileNameWitPath, FileMode.Create))
+            try
             {
-                using (BinaryWriter bw = new BinaryWriter(fs))
+                string fileNameWitPath = path + (GetLastNumberOfFile() + 1).ToString() + ".png";
+                string fileNameWitPathNew = path + (GetLastNumberOfFile() + 1).ToString() + "_new.png";
+                using (FileStream fs = new FileStream(fileNameWitPath, FileMode.Create))
                 {
-                    byte[] data = Convert.FromBase64String(image);
-                    bw.Write(data);
-                    bw.Dispose();
-                    bw.Close();
+                    using (BinaryWriter bw = new BinaryWriter(fs))
+                    {
+                        byte[] data = Convert.FromBase64String(image);
+                        bw.Write(data);
+                    }
                 }
-                fs.Dispose();
-                fs.Close();
+                OptimizationImage(fileNameWitPath, fileNameWitPathNew);
+                RenameFileAndDelete(fileNameWitPathNew, fileNameWitPath);
+                return fileNameWitPath;
             }
-            OptimizationImage(fileNameWitPath, fileNameWitPathNew);
-            RenameFileAndDelete(fileNameWitPathNew, fileNameWitPath);
-            return fileNameWitPath;
+            catch (Exception ex)
+            {
+                Program.Logger.Error(ex.Message);
+                return null;
+            }
         }
 
         /// <summary>

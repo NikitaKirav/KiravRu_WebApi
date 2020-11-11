@@ -15,6 +15,7 @@ using System;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace KiravRu
 {
@@ -33,7 +34,7 @@ namespace KiravRu
             services.Configure<CookiePolicyOptions>(options =>
             {
             // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-            options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -119,12 +120,17 @@ namespace KiravRu
                 app.UseDeveloperExceptionPage();
             }
 
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors("AllowOrigin");
             //app.UseCors(
             //    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
             //);
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
             app.UseAuthentication();
             app.UseAuthorization();
 

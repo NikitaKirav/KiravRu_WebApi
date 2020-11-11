@@ -33,7 +33,7 @@ namespace KiravRu.Controllers
         public ActionResult UploadImage([FromBody] object imageData)
         {
             try
-            {            
+            {                
                 var result = CheckRemoteIpAddressOfUser();
                 if (result != "Ok") { return Ok(new { result = result }); }
                 var image = JsonConvert.DeserializeObject<Image>(imageData.ToString());
@@ -45,7 +45,8 @@ namespace KiravRu.Controllers
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                Program.Logger.Error(ex.Message);
+                return Ok(new { error="Bad request!" });
             }
         }
 
@@ -73,6 +74,7 @@ namespace KiravRu.Controllers
         private string CheckRemoteIpAddressOfUser()
         {
             var remoteIpAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+            Program.Logger.Info("remoteIpAddress: " + remoteIpAddress);
             DateTime lastDate = _historyChange.GetLastDateTimeUsingIpAddress(remoteIpAddress);
             if (DateTime.Now < lastDate.AddMinutes(15))
             {
