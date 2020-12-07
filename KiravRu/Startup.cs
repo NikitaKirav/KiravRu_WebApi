@@ -105,10 +105,16 @@ namespace KiravRu
             services.AddTransient<IHistoryChange, HistoryChangeRepository>();
             services.AddTransient<IConstant, ConstantRepository>();
 
-            var notificationMetadata =
-                Configuration.GetSection("NotificationMetadata").
-                Get<NotificationMetadata>();
-            services.AddSingleton(notificationMetadata);
+            try
+            {
+                var notificationMetadata =
+                    Configuration.GetSection("NotificationMetadata").
+                    Get<NotificationMetadata>();
+                services.AddSingleton(notificationMetadata);
+            } catch (Exception ex)
+            {
+                Program.Logger.Error(ex.Message);
+            }
             services.AddControllers();
             //services.AddDataProtection()
             //.PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
