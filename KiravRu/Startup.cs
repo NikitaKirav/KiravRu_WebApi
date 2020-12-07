@@ -105,11 +105,16 @@ namespace KiravRu
             services.AddTransient<IHistoryChange, HistoryChangeRepository>();
             services.AddTransient<IConstant, ConstantRepository>();
 
+            var notificationMetadata =
+                Configuration.GetSection("NotificationMetadata").
+                Get<NotificationMetadata>();
+            services.AddSingleton(notificationMetadata);
+            services.AddControllers();
             //services.AddDataProtection()
-                //.PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
-                //.SetApplicationName("KiravRu")
-                //.SetDefaultKeyLifetime(TimeSpan.FromDays(90));
-                //.ProtectKeysWithCertificate(new X509Certificate2("certificate.pfx", "password"));
+            //.PersistKeysToFileSystem(new DirectoryInfo(@"\Keys\"))
+            //.SetApplicationName("KiravRu")
+            //.SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+            //.ProtectKeysWithCertificate(new X509Certificate2("certificate.pfx", "password"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
