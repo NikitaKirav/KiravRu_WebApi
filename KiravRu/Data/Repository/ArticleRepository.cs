@@ -65,9 +65,9 @@ namespace KiravRu.Data.Repository
             // get a list of article
             var articles = _db.Articles.Include(c => c.Category).AsEnumerable()
                 .Where(x =>
-                (x.Name != null && x.Name.Contains(blogFilter.Search)) ||
-                (x.Text != null && x.Text.Contains(blogFilter.Search)) ||
-                (x.ShortDescription != null && x.ShortDescription.Contains(blogFilter.Search)))
+                (x.Name != null && x.Name.ToLower().Contains(blogFilter.Search.ToLower())) ||
+                (x.Text != null && x.Text.ToLower().Contains(blogFilter.Search.ToLower())) ||
+                (x.ShortDescription != null && x.ShortDescription.ToLower().Contains(blogFilter.Search.ToLower())))
                             .Join(listOfArticles, 
                             leftItem => leftItem.Id, 
                             rightItem => rightItem.ArticleId, 

@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+  backend:
+    image: ${DOCKER_REGISTRY-}kiravru
+    build:
+      context: .
+      dockerfile: KiravRu/Dockerfile
+    container_name: backend
+
+  postgres_db:
+    image: postgres:14.2-alpine
+    container_name: postgres_db
+    
+  client:
+    image: client
+    build: 
+      context: ../KiravRu_ClientApp
+      dockerfile: Dockerfile.prod
+    container_name: client
+    #environment:
+    #  - NODE_ENV=production
+  
+  messanger_backend:
+    build:
+      context: ../Messanger_WebAPI
+      dockerfile: Dockerfile
+    image: messanger_backend_image
+    container_name: messanger_backend
+    restart: unless-stopped
+  
+  messanger_client:
+    image: messanger_client
+    build: 
+      context: ../messanger_client
+      dockerfile: Dockerfile.prod
+    container_name: messanger_client
+    #environment:
+    #  - NODE_ENV=production
+      #- PUBLIC_URL=http://messanger_client:80/works/messenger/
+
+  messanger_db:
+    image: mongo:4.2
+    container_name: messanger_db
+    restart: unless-stopped    
+
+  nginx:
+    image: nginx:mainline-alpine
+    container_name: nginx
+    restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot
+    restart: unless-stopped

@@ -1,0 +1,99 @@
+version: '3.4'
+
+services:
+  backend:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - AUTHTOKEN_ISSUER=${AUTHTOKEN_ISSUER}
+      - AUTHTOKEN_KEY=${AUTHTOKEN_KEY}
+      - AUTHTOKEN_AUDIENCE=${AUTHTOKEN_AUDIENCE}
+      - CUSTOMCONNSTR_ConnectionKiravRu=Server=postgres_db;Port=5432;Database=${POSTGRES_DB};User ID=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Integrated Security=true;Pooling=true;
+    ports:
+      - "5000:80"
+    volumes:
+      - backend_images:/app/wwwroot/images
+      - ../images:/app/wwwroot/images
+      - /images:/app/wwwroot/images
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+    depends_on:
+      - "postgres_db"
+
+  postgres_db:
+    ports:
+      - "8765:5432"
+    restart: always
+    volumes:
+      - db_volume:/var/lib/postgresql/data
+      - ../kiravdb.sql:/docker-entrypoint-initdb.d/kiravdb.sql
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+
+  client:
+    ports:
+      - "6050:3000"
+
+  messanger_backend:
+    environment:
+      - MONGO_HOSTNAME=messanger_db
+      - MESSANGER_PORT=${MESSANGER_PORT}
+      - MESSANGER_JWT_SECRET=${MESSANGER_JWT_SECRET}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_DB=${MONGO_DB}
+      - NODE_ENV=production
+    ports:
+      - "4040:4040"
+      - "8081:8081"
+      - "3000:8081"
+    volumes:
+      - messeger_upload:/app/uploads
+    #  - node_modules:/app/node_modules
+    command: ./wait-for.sh messanger_db:${MONGO_PORT} -- /app/node_modules/.bin/nodemon server.js
+    #command: /home/node/app/node_modules/.bin/nodemon app.js
+    depends_on:
+      - "messanger_db"
+
+  messanger_client:
+    ports:
+      - "6001:8080"
+
+  messanger_db:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+      - DB_NAME=${MONGO_DB}
+      - DB_USER=${MONGO_USERNAME}
+      - DB_PASSWORD=${MONGO_PASSWORD}
+    ports:
+      - "${MONGO_PORT}:${MONGO_PORT}"
+    volumes:  
+      - messanger_dbdata:/data/db
+      #- ../Messanger_WebAPI/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+      - ../Messanger_WebAPI/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
+
+  nginx:
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    ports:
+      - "80:80"
+      - "443:443"
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+
+  certbot:
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    
+volumes:
+  db_volume:
+  messanger_dbdata:
+  messeger_upload:
+  backend_images:
+  #node_modules: 
