@@ -32,7 +32,7 @@ services:
   messanger_client:
     image: messanger_client
     build: 
-      context: ../messanger_client
+      context: ../Messanger_Client
       dockerfile: Dockerfile.prod
     container_name: messanger_client
     #environment:
