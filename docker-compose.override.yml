@@ -12,9 +12,7 @@ services:
       - "5000:80"
     volumes:
       - backend_images:/app/wwwroot/images
-      - ../images:/app/wwwroot/images
-      - /images:/app/wwwroot/images
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      #- ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     depends_on:
       - "postgres_db"
 
@@ -51,10 +49,10 @@ services:
     volumes:
       - messeger_upload:/app/uploads
     #  - node_modules:/app/node_modules
-    command: ./wait-for.sh messanger_db:${MONGO_PORT} -- /app/node_modules/.bin/nodemon server.js
+    command: /bin/sh -c './wait-for.sh messanger_db:${MONGO_PORT} -- /app/node_modules/.bin/nodemon server.js'
     #command: /home/node/app/node_modules/.bin/nodemon app.js
     depends_on:
-      - "messanger_db"
+      - messanger_db
 
   messanger_client:
     ports:
@@ -72,7 +70,6 @@ services:
       - "${MONGO_PORT}:${MONGO_PORT}"
     volumes:  
       - messanger_dbdata:/data/db
-      #- ../Messanger_WebAPI/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
       - ../Messanger_WebAPI/mongo-init.sh:/docker-entrypoint-initdb.d/mongo-init.sh
 
   nginx:
