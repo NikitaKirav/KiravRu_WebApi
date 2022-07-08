@@ -35,7 +35,7 @@ namespace KiravRu.Controllers
                     message.Sender = new MailboxAddress("Self", _notificationMetadata.Sender);
                     message.Reciever = new MailboxAddress("Self", _notificationMetadata.Reciever);
                     message.Subject = "Message from " + messageAPI.email ?? "anonymous";
-                    message.Content = messageAPI.message;
+                    message.Content = "My name is " + messageAPI.name + ". Text: " + messageAPI.message;
                     var mimeMessage = CreateEmailMessage(message);
                     using (SmtpClient smtpClient = new SmtpClient())
                     {

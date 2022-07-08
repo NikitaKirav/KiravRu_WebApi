@@ -8,6 +8,12 @@ services:
       - AUTHTOKEN_KEY=${AUTHTOKEN_KEY}
       - AUTHTOKEN_AUDIENCE=${AUTHTOKEN_AUDIENCE}
       - CUSTOMCONNSTR_ConnectionKiravRu=Server=postgres_db;Port=5432;Database=${POSTGRES_DB};User ID=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Integrated Security=true;Pooling=true;
+      - NotificationMetadata__Password=${NotificationMetadata_Password}
+      - NotificationMetadata__Port=${NotificationMetadata_Port}
+      - NotificationMetadata__Reciever=${NotificationMetadata_Reciever}
+      - NotificationMetadata__Sender=${NotificationMetadata_Sender}
+      - NotificationMetadata__SmtpServer=${NotificationMetadata_SmtpServer}
+      - NotificationMetadata__Username=${NotificationMetadata_Username}
     ports:
       - "5000:80"
     volumes:
