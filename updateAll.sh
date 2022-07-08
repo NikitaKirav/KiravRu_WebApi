@@ -32,6 +32,7 @@ do
     echo "update " $folder
     cd $folder && git fetch
     cd $folder && git reset --hard origin/$branch
+    cd $folder && git-cache-meta --apply
 done
 
 cd $prodDir && docker-compose up -d --build
