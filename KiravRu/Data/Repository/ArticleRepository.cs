@@ -63,15 +63,27 @@ namespace KiravRu.Data.Repository
             // get a list of Id article
             var listOfArticles = _db.ArticlesAccesses.Where(x => rolesIdLast.Any(c => x.RoleId == c)).ToList();
             // get a list of article
-            var articles = _db.Articles.Include(c => c.Category).AsEnumerable()
-                .Where(x =>
-                (x.Name != null && x.Name.ToLower().Contains(blogFilter.Search.ToLower())) ||
-                (x.Text != null && x.Text.ToLower().Contains(blogFilter.Search.ToLower())) ||
-                (x.ShortDescription != null && x.ShortDescription.ToLower().Contains(blogFilter.Search.ToLower())))
-                            .Join(listOfArticles, 
-                            leftItem => leftItem.Id, 
-                            rightItem => rightItem.ArticleId, 
-                            (leftItem, rightItem) => leftItem).OrderBy(x => x.DateChange);
+            IOrderedEnumerable<Article> articles;
+            if (blogFilter.Search == "")
+            {
+                articles = _db.Articles.Include(c => c.Category).AsEnumerable()
+                    .Join(listOfArticles,
+                    leftItem => leftItem.Id,
+                    rightItem => rightItem.ArticleId,
+                    (leftItem, rightItem) => leftItem).OrderBy(x => x.DateChange);
+            }
+            else
+            {
+                articles = _db.Articles.Include(c => c.Category).AsEnumerable()
+                    .Where(x =>
+                    (x.Name != null && x.Name.ToLower().Contains(blogFilter.Search.ToLower())) ||
+                    (x.Text != null && x.Text.ToLower().Contains(blogFilter.Search.ToLower())) ||
+                    (x.ShortDescription != null && x.ShortDescription.ToLower().Contains(blogFilter.Search.ToLower())))
+                                .Join(listOfArticles,
+                                leftItem => leftItem.Id,
+                                rightItem => rightItem.ArticleId,
+                                (leftItem, rightItem) => leftItem).OrderBy(x => x.DateChange);
+            }
             var model = PagingList.Create(articles, blogFilter.PageSize, blogFilter.PageIndex, blogFilter.Sort, defaultSort);
 
             return model;
