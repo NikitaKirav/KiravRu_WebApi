@@ -1,21 +1,28 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using KiravRu.Interfaces;
-using KiravRu.Data.Repository;
 using KiravRu.Models;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using System;
-using Microsoft.AspNetCore.DataProtection;
-using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using KiravRu.DAL;
+using KiravRu.DAL.Repository.Users;
+using KiravRu.Logic.Interface.Users;
+using KiravRu.Logic.Interface.Categories;
+using KiravRu.DAL.Repository.Notes;
+using KiravRu.Logic.Interface.Notes;
+using KiravRu.Logic.Interface.HistoryChanges;
+using KiravRu.Logic.Interface.Constants;
+using MediatR;
+using KiravRu.Logic.Domain.Users;
+using KiravRu.Logic.Mediator.Queries.Users;
+using KiravRu.Logic.Mediator.QueryHandlers.Users;
 
 namespace KiravRu
 {
@@ -54,7 +61,7 @@ namespace KiravRu
             });
 
             
-            services.AddDbContext<ApplicationContext>(options =>
+            services.AddDbContext<Context>(options =>
             options.UseNpgsql(Configuration.GetConnectionString("ConnectionKiravRu")));
 
             //services.AddCors();
@@ -72,8 +79,8 @@ namespace KiravRu
 
             //services.AddMvc();
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationContext>();
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<Context>();
 
             services.AddAuthentication(options =>
             {
@@ -99,11 +106,25 @@ namespace KiravRu
                 });
             services.AddControllersWithViews();
 
-            services.AddTransient<IAllArticles, ArticleRepository>();
-            services.AddTransient<IArticlesCategory, CategoryRepository>();
-            services.AddTransient<IArticlesAccess, ArticlesAccessRepository>();
-            services.AddTransient<IHistoryChange, HistoryChangeRepository>();
-            services.AddTransient<IConstant, ConstantRepository>();
+            #region Repositories
+            services.AddScoped<IDbContext, Context>();
+            services.AddTransient<IRoleRepository, RoleRepository>();
+            services.AddTransient<ICategoryRepository, DAL.Repository.Categories.CategoryRepository>();
+            services.AddTransient<IConstantRepository, DAL.Repository.Constants.ConstantRepository>();
+            services.AddTransient<IHistoryChangeRepository, DAL.Repository.HistoryChanges.HistoryChangeRepository>();
+            services.AddTransient<INoteAccessRepository, NoteAccessRepository>();
+            services.AddTransient<INoteRepository, NoteRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
+
+            #endregion
+
+            services.AddApiVersioning(o => {
+                o.ReportApiVersions = true;
+                o.AssumeDefaultVersionWhenUnspecified = true;
+                o.DefaultApiVersion = new ApiVersion(1, 0);
+            });
+
+            services.AddMediatR(typeof(GetUserQuery).Assembly, typeof(GetUserQueryHandler).Assembly);
 
             try
             {
