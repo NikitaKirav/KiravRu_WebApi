@@ -20,16 +20,9 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Users
 
         public async Task<GetUsersQueryResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var users = _userManager.Users.ToList();
+            var users = _userManager.Users.ToList();
 
-                return new GetUsersQueryResult() { Users = users };
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There are problems in GetUsersQueryHandler", ex);
-            }
+            return new GetUsersQueryResult() { Users = users };
         }
     }
 }

@@ -2,6 +2,7 @@
 using KiravRu.Logic.Mediator.Commands.Notes;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,22 +19,15 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Notes
 
         public async Task<bool> Handle(DeleteNoteCommand request, CancellationToken cancellationToken)
         {
-            try
+            var note = await _noteRepository.GetNoteByIdAsync(request.NoteId, cancellationToken);
+            if (note == null)
             {
-                var note = await _noteRepository.GetNoteByIdAsync(request.NoteId, cancellationToken);
-                if (note == null)
-                {
-                    throw new Exception("Note dosn't exist with Id = " + request.NoteId);
-                }
-                _noteRepository.Delete(note);
-                await _noteRepository.SaveChanges(cancellationToken);
+                throw new KeyNotFoundException("Note dosn't exist with Id = " + request.NoteId);
+            }
+            _noteRepository.Delete(note);
+            await _noteRepository.SaveChanges(cancellationToken);
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in DeleteNoteCommandHandler", ex);
-            }
+            return true;
         }
     }
 }

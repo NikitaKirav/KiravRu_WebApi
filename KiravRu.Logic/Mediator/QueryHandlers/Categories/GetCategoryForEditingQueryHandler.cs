@@ -19,21 +19,14 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Categories
 
         public async Task<GetCategoryForEditingQueryResult> Handle(GetCategoryForEditingQuery request, CancellationToken cancellationToken)
         {
-            try
+            var category = new Category();
+            if (request.CategoryId != 0)
             {
-                var category = new Category();
-                if (request.CategoryId != 0)
-                {
-                    category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId, cancellationToken);
-                }
-                var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
+                category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId, cancellationToken);
+            }
+            var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
 
-                return new GetCategoryForEditingQueryResult(category, listCategory);
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("There is a problem in GetCategoryForEditingQueryHandler", ex);
-            }
+            return new GetCategoryForEditingQueryResult(category, listCategory);
         }
     }
 }

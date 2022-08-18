@@ -2,6 +2,7 @@
 using KiravRu.Logic.Mediator.Commands.Categories;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,18 +19,15 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Categories
 
         public async Task<bool> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
-            try
+            var category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId, cancellationToken);
+            if (category == null)
             {
-                var category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId, cancellationToken);
-                _categoryRepository.Delete(category);
-                await _categoryRepository.SaveChanges(cancellationToken);
+                throw new KeyNotFoundException(@"Category with Id=" + request.CategoryId + " not found.");
+            }
+            _categoryRepository.Delete(category);
+            await _categoryRepository.SaveChanges(cancellationToken);
 
-                return true;
-            }
-            catch(Exception ex) 
-            {
-                throw new Exception("There is a problem in DeleteCategoryCommandHandler", ex);
-            }
+            return true;
         }
     }
 }

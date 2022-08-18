@@ -28,30 +28,23 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Notes
 
         public async Task<GetNoteForEditingByIdQueryResult> Handle(GetNoteForEditingByIdQuery request, CancellationToken cancellationToken)
         {
-            try
+            var note = new Note();
+            var noteRoles = await _noteAccessRepository.GetRolesAsync(request.NoteId, cancellationToken);
+            var allRoles = await _roleRepository.GetRolesAsync(cancellationToken);
+
+            var listRoles = new NoteRoles
             {
-                var note = new Note();
-                var noteRoles = await _noteAccessRepository.GetRolesAsync(request.NoteId, cancellationToken);
-                var allRoles = await _roleRepository.GetRolesAsync(cancellationToken);
+                UserRoles = noteRoles,
+                AllRoles = allRoles
+            };
 
-                var listRoles = new NoteRoles
-                {
-                    UserRoles = noteRoles,
-                    AllRoles = allRoles
-                };
-
-                if (request.NoteId != 0)
-                {
-                    note = await _noteRepository.GetNoteByIdAsync(request.NoteId, cancellationToken);
-                }
-                var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
-
-                return new GetNoteForEditingByIdQueryResult(note, listCategory, listRoles);
-            }
-            catch(Exception ex)
+            if (request.NoteId != 0)
             {
-                throw new Exception("There is a problem in GetNoteForEditingByIdQueryHandler", ex);
+                note = await _noteRepository.GetNoteByIdAsync(request.NoteId, cancellationToken);
             }
+            var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
+
+            return new GetNoteForEditingByIdQueryResult(note, listCategory, listRoles);
         }
     }
 }

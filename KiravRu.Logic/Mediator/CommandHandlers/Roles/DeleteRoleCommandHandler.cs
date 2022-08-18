@@ -2,7 +2,7 @@
 using KiravRu.Logic.Mediator.Commands.Roles;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,21 +18,14 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Roles
         }
         public async Task<bool> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
         {
-            try
+            Role role = await _roleManager.FindByIdAsync(request.RoleId);
+            if (role == null)
             {
-                Role role = await _roleManager.FindByIdAsync(request.RoleId);
-                if (role == null)
-                {
-                    throw new Exception("Role don't exist with Id = " + request.RoleId);
-                }
-                await _roleManager.DeleteAsync(role);
+                throw new KeyNotFoundException("Role don't exist with Id = " + request.RoleId);
+            }
+            await _roleManager.DeleteAsync(role);
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in DeleteRoleCommandHandler", ex);
-            }
+            return true;
         }
     }
 }

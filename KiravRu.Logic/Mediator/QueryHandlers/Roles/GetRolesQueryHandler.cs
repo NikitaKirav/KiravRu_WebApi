@@ -22,16 +22,8 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Roles
 
         public async Task<GetRolesQueryResult> Handle(GetRolesQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var result = _roleManager.Roles.ToList();
-                return new GetRolesQueryResult() { Roles = result };
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There are problems in GetRolesQueryHandler", ex);
-            }
+            var result = _roleManager.Roles.ToList();
+            return new GetRolesQueryResult() { Roles = result };
         }
     }
 }

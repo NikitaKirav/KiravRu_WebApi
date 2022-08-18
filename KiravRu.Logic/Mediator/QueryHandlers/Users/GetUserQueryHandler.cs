@@ -19,26 +19,19 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Users
 
         public async Task<GetUserQueryResult> Handle(GetUserQuery request, CancellationToken cancellationToken)
         {
-            try
+            var user = await _userRepository.GetById(request.UserId, cancellationToken);
+            var result = new GetUserQueryResult
             {
-                var user = await _userRepository.GetById(request.UserId, cancellationToken);
-                var result = new GetUserQueryResult
+                Id = user.Id,
+                UserName = user.UserName,
+                Roles = user.UserRoles.ConvertAll(r => new IdentityModel<string>
                 {
-                    Id = user.Id,
-                    UserName = user.UserName,
-                    Roles = user.UserRoles.ConvertAll(r => new IdentityModel<string>
-                    {
-                        Id = r.RoleId,
-                        Name = r.Role.Name
-                    })
-                };
+                    Id = r.RoleId,
+                    Name = r.Role.Name
+                })
+            };
 
-                return result;
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("There are problems in GetUserQueryHandler", ex);
-            }
+            return result;
         }
     }
 }

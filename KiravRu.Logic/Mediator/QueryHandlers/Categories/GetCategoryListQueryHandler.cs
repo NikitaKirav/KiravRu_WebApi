@@ -18,16 +18,9 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Categories
 
         public async Task<GetCategoryListQueryResult> Handle(GetCategoryListQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                var categories = await _categoryRepository.GetCategoriesAsync(cancellationToken);
+            var categories = await _categoryRepository.GetCategoriesAsync(cancellationToken);
 
-                return new GetCategoryListQueryResult() { Categories = categories, TotalCategoriesCount = categories.Count };
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("There is a problem in GetCategoryListQueryHandler", ex);
-            }
+            return new GetCategoryListQueryResult() { Categories = categories, TotalCategoriesCount = categories.Count };
         }
     }
 }

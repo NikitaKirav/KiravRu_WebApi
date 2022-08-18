@@ -1,4 +1,5 @@
 ﻿using KiravRu.Logic.Domain.Users;
+using KiravRu.Logic.Helpers;
 using KiravRu.Logic.Mediator.Commands.Roles;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -17,34 +18,27 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Roles
         {
             _roleManager = roleManager;
         }
-                public async Task<AddRoleCommandResult> Handle(AddRoleCommand request, CancellationToken cancellationToken)
+
+        public async Task<AddRoleCommandResult> Handle(AddRoleCommand request, CancellationToken cancellationToken)
         {
-            try
+            if (string.IsNullOrEmpty(request.Name))
             {
-                if (string.IsNullOrEmpty(request.Name))
-                {
-                    throw new Exception("Role name can't be empty.");
-                }
-
-                IdentityResult result = await _roleManager.CreateAsync(new Role(request.Name));
-                if (result.Succeeded)
-                {
-                    return new AddRoleCommandResult { Role = new RoleResult { Name = request.Name } };
-                }
-                else
-                {
-                    List<string> errors = new List<string>();
-                    foreach (var errorText in result.Errors)
-                    {
-                        errors.Add(errorText.Description);
-                    }
-                    return new AddRoleCommandResult { Errors = errors };
-                }
-
+                throw new AppException("Role name can't be empty.");
             }
-            catch (Exception ex)
+
+            IdentityResult result = await _roleManager.CreateAsync(new Role(request.Name));
+            if (result.Succeeded)
             {
-                throw new Exception("There is a problem in AddRoleCommandHandler", ex);
+                return new AddRoleCommandResult { Role = new RoleResult { Name = request.Name } };
+            }
+            else
+            {
+                List<string> errors = new List<string>();
+                foreach (var errorText in result.Errors)
+                {
+                    errors.Add(errorText.Description);
+                }
+                return new AddRoleCommandResult { Errors = errors };
             }
         }
     }

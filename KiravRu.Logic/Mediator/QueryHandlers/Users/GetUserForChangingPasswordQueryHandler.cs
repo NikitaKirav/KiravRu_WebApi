@@ -3,6 +3,7 @@ using KiravRu.Logic.Mediator.Queries.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,20 +20,13 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Users
 
         public async Task<GetUserForChangingPasswordQueryResult> Handle(GetUserForChangingPasswordQuery request, CancellationToken cancellationToken)
         {
-            try
+            User user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
             {
-                User user = await _userManager.FindByIdAsync(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("System don't have user with Id = " + request.UserId);
-                }
-                UserInfo model = new UserInfo { Id = user.Id, Email = user.Email };
-                return new GetUserForChangingPasswordQueryResult { User = model };
+                throw new KeyNotFoundException("System don't have user with Id = " + request.UserId);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("There are problems in GetUserForChangingPasswordQueryHandler", ex);
-            }
+            UserInfo model = new UserInfo { Id = user.Id, Email = user.Email };
+            return new GetUserForChangingPasswordQueryResult { User = model };
         }
     }
 }

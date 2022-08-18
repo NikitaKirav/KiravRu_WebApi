@@ -18,17 +18,10 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Arts
 
         public async Task<bool> Handle(AddNewHistoryNoteCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                _historyChangeRepository.AddToSet(request.HistoryChange);
-                await _historyChangeRepository.SaveChanges(cancellationToken);
+            _historyChangeRepository.AddToSet(request.HistoryChange);
+            await _historyChangeRepository.SaveChanges(cancellationToken);
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in AddNewHistoryNoteCommandHandler", ex);
-            }
+            return true;
         }
     }
 }

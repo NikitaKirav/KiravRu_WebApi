@@ -1,8 +1,10 @@
-﻿using KiravRu.Logic.Interface.Notes;
+﻿using KiravRu.Logic.Domain.Notes;
+using KiravRu.Logic.Interface.Notes;
 using KiravRu.Logic.Interface.Users;
 using KiravRu.Logic.Mediator.Queries.Notes;
 using MediatR;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,26 +26,20 @@ namespace KiravRu.Logic.Mediator.QueryHandlers.Notes
 
         public async Task<GetNoteByIdQueryResult> Handle(GetNoteByIdQuery request, CancellationToken cancellationToken)
         {
-            try
-            {
-                // get Ids of roles of current user
-                var roleIds = await _roleRepository.GetRoleIdsByRoleNamesAsync(request.UserRoles, cancellationToken);
-                // get a list of Id article
-                var listOfNotes = await _noteAccessRepository.GetListOfNotesByRoleIds(roleIds, cancellationToken);
-                // get an note
-                var note = _noteRepository.GetNoteByIdWithAccess(request.NoteId, listOfNotes);
+            // get Ids of roles of current user
+            var roleIds = await _roleRepository.GetRoleIdsByRoleNamesAsync(request.UserRoles, cancellationToken);
+            // get a list of Id article
+            var listOfNotes = await _noteAccessRepository.GetListOfNotesByRoleIds(roleIds, cancellationToken);
+            // get an note
+            var note = _noteRepository.GetNoteByIdWithAccess(request.NoteId, listOfNotes);
 
-                if (note == null)
-                {
-                    throw new Exception(@"Note with Id=" + request.NoteId + " not found.");
-                }
-
-                return new GetNoteByIdQueryResult(note);
-            }
-            catch(Exception ex)
+            if (note == null)
             {
-                throw new Exception("There is a problem in GetNoteByIdQueryHandler", ex);
+                throw new KeyNotFoundException(@"Note with Id=" + request.NoteId + " not found.");
             }
+
+            return new GetNoteByIdQueryResult(note);
+
         }
     }
 }

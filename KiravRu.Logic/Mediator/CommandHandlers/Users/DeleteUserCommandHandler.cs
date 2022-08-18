@@ -3,6 +3,7 @@ using KiravRu.Logic.Mediator.Commands.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,21 +20,14 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Users
 
         public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            try
+            User user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
             {
-                User user = await _userManager.FindByIdAsync(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("System don't have user with Id = " + request.UserId);
-                }
-                await _userManager.DeleteAsync(user);
+                throw new KeyNotFoundException("System don't have user with Id = " + request.UserId);
+            }
+            await _userManager.DeleteAsync(user);
 
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in DeleteUserCommandHandler", ex);
-            }
+            return true;
         }
     }
 }

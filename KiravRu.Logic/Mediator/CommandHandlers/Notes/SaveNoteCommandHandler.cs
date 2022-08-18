@@ -20,27 +20,20 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Notes
 
         public async Task<int> Handle(SaveNoteCommand request, CancellationToken cancellationToken)
         {
-            try
+            if (request.Note.Id == 0)
             {
-                if (request.Note.Id == 0)
-                {
-                    _noteRepository.AddToSet(request.Note);
-                    await _noteRepository.SaveChanges(cancellationToken);
-                }
-                else
-                {
-                    _noteRepository.Update(request.Note);
-                    await _noteRepository.SaveChanges(cancellationToken);
-                }
-                _noteAccessRepository.ChangeRolesOfNote(request.Note.Id, request.Roles);
-                await _noteAccessRepository.SaveChanges(cancellationToken);
+                _noteRepository.AddToSet(request.Note);
+                await _noteRepository.SaveChanges(cancellationToken);
+            }
+            else
+            {
+                _noteRepository.Update(request.Note);
+                await _noteRepository.SaveChanges(cancellationToken);
+            }
+            _noteAccessRepository.ChangeRolesOfNote(request.Note.Id, request.Roles);
+            await _noteAccessRepository.SaveChanges(cancellationToken);
 
-                return request.Note.Id;
-            }
-            catch(Exception ex)
-            {
-                throw new Exception("There is a problem in SaveNoteCommandHandler", ex);
-            }
+            return request.Note.Id;
         }
     }
 }

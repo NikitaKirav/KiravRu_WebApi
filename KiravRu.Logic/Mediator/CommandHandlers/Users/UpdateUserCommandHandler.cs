@@ -20,34 +20,27 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Users
 
         public async Task<UpdateUserCommandResult> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            try
+            User user = await _userManager.FindByIdAsync(request.Id);
+            if (user == null)
             {
-                User user = await _userManager.FindByIdAsync(request.Id);
-                if (user == null)
-                {
-                    throw new Exception("System don't have user with Id = " + request.Id);
-                }
-                user.Email = request.Email;
-                user.UserName = request.UserName;
-
-                var result = await _userManager.UpdateAsync(user);
-                if (result.Succeeded)
-                {
-                    return new UpdateUserCommandResult() { Email = request.Email, UserName = request.UserName };
-                }
-                else
-                {
-                    List<string> errors = new List<string>();
-                    foreach (var errorText in result.Errors)
-                    {
-                        errors.Add(errorText.Description);
-                    }
-                    return new UpdateUserCommandResult() { Errors = errors };
-                }
+                throw new KeyNotFoundException("System don't have user with Id = " + request.Id);
             }
-            catch (Exception ex)
+            user.Email = request.Email;
+            user.UserName = request.UserName;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
             {
-                throw new Exception("There is a problem in UpdateUserCommandHandler", ex);
+                return new UpdateUserCommandResult() { Email = request.Email, UserName = request.UserName };
+            }
+            else
+            {
+                List<string> errors = new List<string>();
+                foreach (var errorText in result.Errors)
+                {
+                    errors.Add(errorText.Description);
+                }
+                return new UpdateUserCommandResult() { Errors = errors };
             }
         }
     }

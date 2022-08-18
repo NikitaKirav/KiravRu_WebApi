@@ -23,6 +23,7 @@ using MediatR;
 using KiravRu.Logic.Domain.Users;
 using KiravRu.Logic.Mediator.Queries.Users;
 using KiravRu.Logic.Mediator.QueryHandlers.Users;
+using KiravRu.Middleware;
 
 namespace KiravRu
 {
@@ -163,6 +164,10 @@ namespace KiravRu
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             });
+
+            // global error handler
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

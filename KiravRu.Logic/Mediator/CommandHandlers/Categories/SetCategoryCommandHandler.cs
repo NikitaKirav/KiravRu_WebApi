@@ -19,31 +19,24 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Categories
 
         public async Task<SetCategoryCommandResult> Handle(SetCategoryCommand request, CancellationToken cancellationToken)
         {
-            try
+            var category = new Category
             {
-                var category = new Category
-                {
-                    Id = request.Id,
-                    Description = request.Description,
-                    ImagePath = request.ImagePath,
-                    ImageText = request.ImageText,
-                    Name = request.Name,
-                    NestingLevelId = request.NestingLevelId,
-                    OrderItem = request.OrderItem,
-                    Visible = request.Visible
-                };
-                _categoryRepository.Save(category);
-                await _categoryRepository.SaveChanges(cancellationToken);
+                Id = request.Id,
+                Description = request.Description,
+                ImagePath = request.ImagePath,
+                ImageText = request.ImageText,
+                Name = request.Name,
+                NestingLevelId = request.NestingLevelId,
+                OrderItem = request.OrderItem,
+                Visible = request.Visible
+            };
+            _categoryRepository.Save(category);
+            await _categoryRepository.SaveChanges(cancellationToken);
 
 
-                var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
+            var listCategory = await _categoryRepository.OrderAllCategoryAsync(0, cancellationToken);
 
-                return new SetCategoryCommandResult(category, listCategory);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in SetCategoryCommandHandler", ex);
-            }
+            return new SetCategoryCommandResult(category, listCategory);
         }
     }
 }

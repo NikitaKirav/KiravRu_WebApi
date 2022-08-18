@@ -1,4 +1,5 @@
 ﻿using KiravRu.Logic.Domain.Users;
+using KiravRu.Logic.Helpers;
 using KiravRu.Logic.Interface.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,13 +22,7 @@ namespace KiravRu.DAL.Repository.Users
 
         public async Task<string[]> GetRoleIdsByRoleNamesAsync(IList<string> roles, CancellationToken ct)
         {
-            try
-            {
-                return await _dbContext.GetQuery<Role>().Where(x => roles.Any(c => c == x.Name)).Select(x => x.Id).ToArrayAsync(ct);
-            } catch (Exception ex)
-            {
-                throw new Exception("Error", ex);
-            }
+            return await _dbContext.GetQuery<Role>().Where(x => roles.Any(c => c == x.Name)).Select(x => x.Id).ToArrayAsync(ct);
         }
 
         public async Task<List<Role>> GetRolesAsync(CancellationToken ct)

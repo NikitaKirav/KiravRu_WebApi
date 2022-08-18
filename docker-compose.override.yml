@@ -18,6 +18,7 @@ services:
       - "80"
     volumes:
       - backend_images:/app/wwwroot/images
+      - backend_logs:/app/publish/logs
       #- ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     depends_on:
       - "postgres_db"
@@ -98,4 +99,5 @@ volumes:
   messanger_dbdata:
   messeger_upload:
   backend_images:
+  backend_logs:
   #node_modules: 

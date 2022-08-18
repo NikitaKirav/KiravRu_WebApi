@@ -3,6 +3,7 @@ using KiravRu.Logic.Mediator.Commands.Roles;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,27 +20,20 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Roles
         }
         public async Task<bool> Handle(UpdateAccessCommand request, CancellationToken cancellationToken)
         {
-            try
+            User user = await _userManager.FindByIdAsync(request.UserId);
+            if (user == null)
             {
-                User user = await _userManager.FindByIdAsync(request.UserId);
-                if (user == null)
-                {
-                    throw new Exception("User don't exist with Id = " + request.UserId);
-                }
-                var userRoles = await _userManager.GetRolesAsync(user);
-                var addedRoles = request.Roles.Except(userRoles);
-                var removedRoles = userRoles.Except(request.Roles);
-
-                await _userManager.AddToRolesAsync(user, addedRoles);
-
-                await _userManager.RemoveFromRolesAsync(user, removedRoles);
-
-                return true;
+                throw new KeyNotFoundException("User don't exist with Id = " + request.UserId);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("There is a problem in UpdateAccessCommandHandler", ex);
-            }
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var addedRoles = request.Roles.Except(userRoles);
+            var removedRoles = userRoles.Except(request.Roles);
+
+            await _userManager.AddToRolesAsync(user, addedRoles);
+
+            await _userManager.RemoveFromRolesAsync(user, removedRoles);
+
+            return true;
         }
     }
 }

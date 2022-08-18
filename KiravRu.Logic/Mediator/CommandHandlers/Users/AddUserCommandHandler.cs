@@ -20,27 +20,20 @@ namespace KiravRu.Logic.Mediator.CommandHandlers.Users
 
         public async Task<AddUserCommandResult> Handle(AddUserCommand request, CancellationToken cancellationToken)
         {
-            try
+            User user = new User { Email = request.Email, UserName = request.UserName };
+            var result = await _userManager.CreateAsync(user, request.Password);
+            if (result.Succeeded)
             {
-                User user = new User { Email = request.Email, UserName = request.UserName };
-                var result = await _userManager.CreateAsync(user, request.Password);
-                if (result.Succeeded)
-                {
-                    return new AddUserCommandResult() { Email = request.Email, UserName = request.UserName };
-                }
-                else
-                {
-                    List<string> errors = new List<string>();
-                    foreach (var error in result.Errors)
-                    {
-                        errors.Add(error.Description);
-                    }
-                    return new AddUserCommandResult() { Errors = errors };
-                }
+                return new AddUserCommandResult() { Email = request.Email, UserName = request.UserName };
             }
-            catch (Exception ex)
+            else
             {
-                throw new Exception("There is a problem in AddUserCommandHandler", ex);
+                List<string> errors = new List<string>();
+                foreach (var error in result.Errors)
+                {
+                    errors.Add(error.Description);
+                }
+                return new AddUserCommandResult() { Errors = errors };
             }
         }
     }
