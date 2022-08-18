@@ -18,7 +18,7 @@ services:
       - "80"
     volumes:
       - backend_images:/app/wwwroot/images
-      - backend_logs:/app/publish/logs
+      - backend_logs:/app/logs
       #- ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
     depends_on:
       - "postgres_db"
